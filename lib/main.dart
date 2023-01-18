@@ -5,6 +5,7 @@ import 'pages/home.dart';
 import 'pages/profile.dart';
 import 'pages/track_orders.dart';
 import 'pages/track_orders.dart';
+import 'pages/payment.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +43,8 @@ class _main_pageState extends State<main_page> {
       profile_load(
         p: widget.index,
       ),
-      track_orders(),
+      ////////////////////////
+      Payment(),
     ];
     return Scaffold(
       body: IndexedStack(
