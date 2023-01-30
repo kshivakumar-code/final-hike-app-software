@@ -1,17 +1,36 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hike_latest/pages/enter_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:hike_latest/pages/login_page.dart';
 
+import '../main.dart';
+
 class otp extends StatefulWidget {
-  const otp({Key? key}) : super(key: key);
+  String phone;
+  otp({Key? key, required this.phone}) : super(key: key);
 
   @override
   State<otp> createState() => _otpState();
 }
 
 class _otpState extends State<otp> {
+
   final FirebaseAuth auth = FirebaseAuth.instance;
+  int flag=0;
+  Future getprofile() async {
+    final  a= FirebaseAuth.instance.currentUser!;
+    await FirebaseFirestore.instance
+        .collection('Profiles')
+        .doc(a.uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        flag=1;
+      }
+    });
+        return flag;
+  }
   TextEditingController smscode = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -70,16 +89,39 @@ class _otpState extends State<otp> {
               PhoneAuthCredential credential = PhoneAuthProvider.credential(
                   verificationId: login_page.verification_id,
                   smsCode: code);
+              // Loader
+              showDialog(context: context,
+                  barrierDismissible: false,
+                  builder:(context){
+                    return Center(child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xF73A2DCD)),
+                    ) );
+                  });
               // Sign the user in (or link) with the credential
               await auth.signInWithCredential(credential);
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(
-                      builder: (context) => enter_profile_page()));
+              await getprofile();
+              Navigator.of(context).pop();
+              if(flag==1)
+                {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => main_page(index: 1)),
+                          (route) => false);
+                }
+              else {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            enter_profile_page(phone: widget.phone)));
+              }
             }
             catch(e)
             {
+              Navigator.of(context).pop();
               showDialog(
                   context: context,
+                  barrierDismissible: false,
                   builder: (BuildContext context) => AlertDialog(
                     title: const Text('Invalid OTP'),
                     content:

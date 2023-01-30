@@ -221,7 +221,8 @@ class _order_summaryState extends State<order_summary> {
         color: const Color(0xF73A2DCD),
         child: InkWell(
           onTap: () {
-            //print('called on tap');
+           // Navigator.push(
+                //context, MaterialPageRoute(builder: (context) => Payment()));
           },
           child: const SizedBox(
             height: kToolbarHeight,

@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:drop_shadow_image/drop_shadow_image.dart';
 import 'package:hike_latest/pages/Notifications.dart';
 import 'package:hike_latest/pages/parcel_details.dart';
+import 'package:hike_latest/services/get_profile.dart';
 
 class home_page extends StatefulWidget {
   @override
@@ -20,6 +22,11 @@ class _home_pageState extends State<home_page> {
   TextEditingController phone_number = TextEditingController();
   String start = 'intial';
   String end = 'intial';
+  Future getp() async
+  {
+    await get_profile().getprofile();
+    return 0;
+  }
   @override
   void initState() {
     // TODO: implement initState
@@ -28,7 +35,8 @@ class _home_pageState extends State<home_page> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)  {
+    getp();
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
 //APP BAR
@@ -51,7 +59,7 @@ class _home_pageState extends State<home_page> {
             ),
             SizedBox(height: 10),
             Text(
-              "NAME",
+              profile['Firstname'].toString(),
               style: TextStyle(
                   letterSpacing: 2.0,
                   fontSize: 20.0,

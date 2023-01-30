@@ -5,7 +5,7 @@ import 'pages/home.dart';
 import 'pages/profile.dart';
 import 'pages/track_orders.dart';
 import 'pages/track_orders.dart';
-import 'pages/payment.dart';
+import 'package:flutter/widgets.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,27 +35,23 @@ class main_page extends StatefulWidget {
 }
 
 class _main_pageState extends State<main_page> {
-  int cur_index = 0;
   @override
   Widget build(BuildContext context) {
     final screens = [
       home_page(),
-      profile_load(
-        p: widget.index,
-      ),
-      ////////////////////////
-      Payment(),
+      profile_load(),
+      track_orders(),
     ];
     return Scaffold(
       body: IndexedStack(
-        index: cur_index,
+        index: super.widget.index,
         children: screens,
       ),
 // Bottom Navigation Bar
       bottomNavigationBar: Container(
         child: BottomNavigationBar(
-            currentIndex: cur_index,
-            onTap: (index) => setState(() => cur_index = index),
+            currentIndex: super.widget.index,
+            onTap: (index) => setState(() => super.widget.index = index),
             backgroundColor: Color(0xF73A2DCD),
             selectedItemColor: Colors.white,
             unselectedItemColor: Colors.white,

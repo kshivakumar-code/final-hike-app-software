@@ -1,20 +1,18 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hike_latest/pages/profile.dart';
 import 'package:flutter/material.dart';
+import 'package:hike_latest/services/get_profile.dart';
+
+import '../main.dart';
+import '../services/user.dart';
 
 class edit_page extends StatelessWidget {
-  String firstname;
-  String lastname;
-  String Mail;
-  edit_page({
-    Key? key,
-    required this.firstname,
-    required this.lastname,
-    required this.Mail,
-  }) : super(key: key);
+
   TextEditingController fn = TextEditingController();
   TextEditingController ln = TextEditingController();
   TextEditingController ml = TextEditingController();
   static const String _title = 'Edit Profile';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +39,7 @@ class edit_page extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   margin: EdgeInsets.fromLTRB(10, 0, 5, 0),
-                  child: Text('Previous First Name : $firstname'),
+                  child: Text('Previous First Name : ${profile['Firstname'].toString()}'),
                   decoration: BoxDecoration(
                     border: Border.all(
                       width: 1.0,
@@ -51,6 +49,7 @@ class edit_page extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   child: TextField(
+                    textCapitalization: TextCapitalization.words,
                     controller: fn,
                     decoration: const InputDecoration(
                       labelText: 'First Name',
@@ -61,7 +60,7 @@ class edit_page extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   margin: EdgeInsets.fromLTRB(10, 10, 5, 0),
-                  child: Text('Previous Last Name : $lastname'),
+                  child: Text('Previous Last Name : ${profile['Lastname'].toString()}'),
                   decoration: BoxDecoration(
                     border: Border.all(
                       width: 1.0,
@@ -71,6 +70,7 @@ class edit_page extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   child: TextField(
+                    textCapitalization: TextCapitalization.words,
                     controller: ln,
                     decoration: const InputDecoration(
                       labelText: 'Last Name',
@@ -81,7 +81,7 @@ class edit_page extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   margin: EdgeInsets.fromLTRB(10, 10, 5, 0),
-                  child: Text('Previous Email : $Mail'),
+                  child: Text('Previous Email : ${profile['Email'].toString()}'),
                   decoration: BoxDecoration(
                     border: Border.all(
                       width: 1.0,
@@ -115,7 +115,7 @@ class edit_page extends StatelessWidget {
                         },
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (ln.text.isEmpty == true ||
                           fn.text.isEmpty == true ||
                           ml.text.isEmpty == true) {
@@ -133,7 +133,24 @@ class edit_page extends StatelessWidget {
                           ),
                         );
                       } else {
-                        Navigator.pop(context);
+                        final auth= FirebaseAuth.instance.currentUser !;
+                        //Loader
+                        showDialog(context: context,
+                            barrierDismissible: false,
+                            builder:(context){
+                              return Center(child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(Color(0xF73A2DCD)),
+                              ) );
+                            });
+                        await DatabaseService(uid:auth.uid
+                        ).updateProfile(fn.text, ln.text, ml.text, profile['Phone'].toString());
+                        get_profile().getprofile();
+                        Navigator.of(context).pop();
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => main_page(index: 1)),
+                                (route) => false);
                       }
                     },
                     child: const Text('SAVE'))

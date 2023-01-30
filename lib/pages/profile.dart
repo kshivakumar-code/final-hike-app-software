@@ -1,15 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hike_latest/pages/edit_profile.dart';
+import 'package:hike_latest/services/user.dart';
+
+import '../services/get_profile.dart';
 
 class profile_page extends StatefulWidget {
-  String firstname;
-  String Lastname;
-  String mail;
   profile_page({
     Key? key,
-    required this.firstname,
-    required this.Lastname,
-    required this.mail,
   }) : super(key: key);
   @override
   State<profile_page> createState() => _profile_pageState();
@@ -17,12 +16,16 @@ class profile_page extends StatefulWidget {
 
 class _profile_pageState extends State<profile_page> {
   @override
+  void initState() {
+    super.initState();
+  }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          'PROFILE',
+          "PROFILE",
           style: TextStyle(
               letterSpacing: 2.0,
               fontSize: 20.0,
@@ -43,14 +46,10 @@ class _profile_pageState extends State<profile_page> {
 // profile edit
           InkWell(
             onTap: () async {
-              final first;
-              first = await Navigator.push(
+              await Navigator.push(
                   context,
                   MaterialPageRoute<dynamic>(
                       builder: (context) => edit_page(
-                            firstname: super.widget.firstname,
-                            lastname: super.widget.Lastname,
-                            Mail: super.widget.mail,
                           )));
               setState(() {
                 //load data from server
@@ -62,9 +61,9 @@ class _profile_pageState extends State<profile_page> {
                 Container(
                   margin: EdgeInsets.fromLTRB(50, 40, 80, 10),
                   child: Text(
-                    super.widget.firstname,
+                    profile['Firstname'].toString(),
                     style: TextStyle(
-                      fontSize: 40,
+                      fontSize: 30,
                     ),
                   ),
                 ),
@@ -83,7 +82,7 @@ class _profile_pageState extends State<profile_page> {
           ),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 50, vertical: 0),
-            child: Text('+91 XXXXX-XXXXX'),
+            child: Text(profile['Phone'].toString()),
           ),
           SizedBox(height: 10),
 // KYC Verification
@@ -199,7 +198,30 @@ class _profile_pageState extends State<profile_page> {
           ),
 // logout
           InkWell(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text('Logout !'),
+                  content: const Text('Do you want to Logout ?'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        FirebaseAuth.instance.signOut();
+                      },
+                      child: const Text('LOGOUT'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('NO'),
+                    ),
+                  ],
+                ),
+              );
+            },
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[

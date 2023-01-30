@@ -17,7 +17,6 @@ class _login_pageState extends State<login_page> {
     countryController.text = '+91';
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,7 +81,7 @@ class _login_pageState extends State<login_page> {
             onTap: () async {
               int l = phone_number.text.length;
               String phone = phone_number.text.toString();
-              for (int i = 0; i < l; i++) {
+             /* for (int i = 0; i < l; i++) {
                 if (phone[i] == '1' ||
                     phone[i] == '2' ||
                     phone[i] == '3' ||
@@ -113,19 +112,46 @@ class _login_pageState extends State<login_page> {
                             ),
                           ],
                         ));
-              } else {
+              } else { */
+                // Loading Widget
+                showDialog(context: context,
+                    barrierDismissible: false,
+                    builder:(context){
+                    return Center(child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xF73A2DCD)),
+                    ) );
+                    });
                 await FirebaseAuth.instance.verifyPhoneNumber(
-                  phoneNumber: '+91$phone',
+                  phoneNumber: countryController.text.toString()+phone,
                   verificationCompleted: (PhoneAuthCredential credential) {},
-                  verificationFailed: (FirebaseAuthException e) {},
+                  verificationFailed: (FirebaseAuthException e) {
+                    if (e.code == 'invalid-phone-number') {
+                      Navigator.of(context).pop();
+                      showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) => AlertDialog(
+                            title: const Text('Invalid Entry'),
+                            content:
+                            const Text('Please Enter Valid Phone Number'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, 'OK'),
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          ));
+                    }
+                  },
                   codeSent: (String verificationId, int? resendToken) {
                     login_page.verification_id=verificationId;
+                    Navigator.of(context).pop();
                     Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => const otp()));
+                        context, MaterialPageRoute(builder: (context) => otp(phone: countryController.text.toString()+phone)));
                   },
                   codeAutoRetrievalTimeout: (String verificationId) {},
                 );
-              }
+              //}
             },
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 80.0, vertical: 20.0),
